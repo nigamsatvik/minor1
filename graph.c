@@ -69,7 +69,7 @@ void addEdge(struct Graph* graph, int src, int dest)
     newNode->next = graph->array[dest].head; 
     graph->array[dest].head = newNode; 
 } 
-void readData()
+void readData()							//satvik tuje isme array me data store krna he..
 {
 	int i = 0;
 	total_rows = 0;
@@ -93,7 +93,7 @@ void readData()
 	}	
 
 }
-void printGraph(struct Graph* graph) 
+/*void printGraph(struct Graph* graph)				//abhi use nhi kr rhe hum adjacency list ..midsem presentation me. 
 { 
     int v; 
     for (v = 1; v <=graph->V; ++v) 
@@ -107,14 +107,19 @@ void printGraph(struct Graph* graph)
         } 
         printf("\n"); 
     } 
-} 
+} */
 int main() 
 {
     graph = createGraph(V); 
 
     readData();    
 				//printGraph function will print the adjacency list of Graph    
-    printGraph(graph); 
+    //printGraph(graph); 
+    printf("Enter Source\n");		//isme source and destination le lyo...
+    scanf("%d",&src);
+    printf("Enter destination");
+    scanf("%d",&dest);
+    PrintDistance();			//satvik esme apne according function define kr dyo..
   
     return 0; 
 } 
