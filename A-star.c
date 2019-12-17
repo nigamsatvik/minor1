@@ -8,6 +8,7 @@
 #define R 6371
 #define TO_RAD (3.1415926536 / 180)
 #define V 28
+#define pi 3.14159265358979323846
 char capital[30][30]={"Agartala","Aizawl","Bengaluru","Bhopal","Bhubaneswar","Chandigarh","Chennai","Dehradun","Dispur",
 "Gandhinagar","Gangtok","Hyderabad_Amaravati","Hyderabad_shared_with_Ap","Imphal","Itanagar","Jaipur","Kohima","Kolkata","Lucknow",
 "Mumbai","Panaji","Patna","Raipur","Ranchi","Shillong","Shimla","Srinagar","Thiruvananthapuram"};
@@ -18,25 +19,24 @@ double hgraph[2][V]={{23.8315,23.7307,12.9716,23.2599,20.2961,
 
 
 
-double heuristic(double th1, double ph1, double th2, double ph2)
+double heuristic(double lat1, double long1, double lat2, double long2)
 {
-	double dx, dy, dz;
-	ph1 -= ph2;
-	ph1 *= TO_RAD, th1 *= TO_RAD, th2 *= TO_RAD;
- 
-	dz = sin(th1) - sin(th2);
-	dx = cos(ph1) * cos(th1) - cos(th2);
-	dy = sin(ph1) * cos(th1);
-	return asin(sqrt(dx * dx + dy * dy + dz * dz) / 2) * 2 * R;
+	double dist;
+    dist = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(long1 - long2);
+    dist = acos(dist);
+    dist = (6371 * pi * dist) / 180;
+    return dist;
 }
-double minarr(double a[], int n) {
-  int c, index=0;
+int minarr(double a[]) {
+  int c, smallest=a[0];
+int smallestindex=0;
 
-  for (c = 1; c < n; c++)
-    if (a[c] > a[index])
-      index = c;
+  for (c = 0; c < 28; c++)
+    {if (a[c] < smallest)
+      {smallest = a[c];
+smallestindex=c;}}
 
-  return index;
+  return smallestindex;
 }
    
    
@@ -44,21 +44,28 @@ double minarr(double a[], int n) {
   
 int Astar(int src,int dest,int graph[V][V])
 {
+int a= src,b= dest;
 int i,s;					   
 int curnode,shortest_node;
 int y=1;
+int j=0;
 int distance=0;
 int nextNode[28];
 double hdistance[28];
 int path[28];
-//if(src==dest)
-//{printf("source and destination cannot be the same");}
+//printf("/n%d/n%d/n",src,dest);
+if(src==dest)
+{printf("source and destination cannot be the same");}
 curnode=src;
 path[0]=curnode;
-while(curnode!=dest)
+//printf("\n%d\n",curnode);
+while(curnode!=b)
 	{int x=0;
-	 for(int j=0;j<28;j++)
+	//printf("\n%d\n",curnode);
+	 //printf("checkpoint a");
+	 for(j=0;j<28;j++)
 	{nextNode[j]=0;hdistance[j]=9999;}
+	//printf("checkpoint1");
 	for(i=0;i<28;i++)
 		{
 		if((graph[curnode][i])!=0)
@@ -66,18 +73,25 @@ while(curnode!=dest)
 			nextNode[x]=i;
 			hdistance[x]=(graph[curnode][i]+heuristic(hgraph[0][i],hgraph[1][i],hgraph[0][dest],hgraph[1][dest]));
 			x++;
+			//printf("\nhd:- %f\n",hdistance[x]);
 						
 			}
 
 		}
-		shortest_node=minarr(hdistance,x);
+	//printf("checkpoint2");
+		shortest_node=minarr(hdistance);
+		//printf("\nShortest Node :- %d\n",shortest_node);
 		//path[y]=nextNode[shortest_node];		
-		y++;
+		
+	//printf("checkpoint3");
 		
 		s=nextNode[shortest_node];
 		distance=distance+graph[curnode][s];
 		curnode=s;
+//printf("\nCurret n%d\n",s);
+	//printf("checkpoint4");
 	}
+//printf("checkpoint 5");
 
 return distance;
 
@@ -126,11 +140,16 @@ for(i=0;i<V;i++)
     printf("\nSelect your city from the above list\n");
     printf("\nEnter your source NUMBER\n");
     scanf("%d",&source);
+    //printf("%d",source);
     printf("\nEnter your Destination NUMBER\n");
     scanf("%d",&destination);
     printf("\nSource        =   %s\nDestination   =   %s\n",capital[source-1],capital[destination-1]);
     final=Astar(source-1,destination-1,graph);
+    printf("The distance between\n");
+    printf("\n%s\n",capital[source-1]);
+    printf("\n%s\n",capital[destination-1]);
     printf("%d",final);
+    printf("\n");
     //for (i=0;i<V;i++)
     //{
     //	printf("%d\n",distance[i]);
